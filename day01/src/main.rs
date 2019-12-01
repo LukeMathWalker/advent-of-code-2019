@@ -14,17 +14,17 @@ fn compute_naive_fuel(module_mass: u64) -> u64 {
     }
 }
 
-fn compute_crazy_fuel(mut mass: u64) -> u64 {
-    let mut total_fuel = 0;
-    loop {
+fn compute_crazy_fuel(mass: u64) -> u64 {
+    recursive_compute_crazy_fuel(mass, 0)
+}
+
+fn recursive_compute_crazy_fuel(mass: u64, total_fuel: u64) -> u64 {
+    if mass == 0 {
+        total_fuel
+    } else {
         let fuel = compute_naive_fuel(mass);
-        if fuel == 0 {
-            break;
-        }
-        total_fuel += fuel;
-        mass = fuel;
+        recursive_compute_crazy_fuel(fuel, total_fuel + fuel)
     }
-    total_fuel
 }
 
 fn main() -> Result<(), anyhow::Error> {
