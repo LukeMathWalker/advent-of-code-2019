@@ -1,0 +1,9 @@
+[package]
+name = "day02"
+version = "0.1.0"
+authors = ["LukeMathWalker <lucapalmieri1993@hotmail.com>"]
+edition = "2018"
+
+
+[dependencies]
+anyhow = "1.0.25"
