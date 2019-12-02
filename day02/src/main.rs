@@ -1,4 +1,5 @@
 use std::str::FromStr;
+use itertools::iproduct;
 
 fn read_input(path: &str) -> Result<Vec<usize>, anyhow::Error> {
     let input = std::fs::read_to_string(path)?;
@@ -83,10 +84,24 @@ fn run_program(noun: usize, verb: usize, mut memory_tape: Vec<usize>) -> Vec<usi
     TuringMachine::new(memory_tape).execute()
 }
 
+fn find_input_pair(desired_output: usize, memory_tape: Vec<usize>) -> Option<(usize, usize)> {
+    for (noun, verb) in iproduct!(0..=99, 0..=99) {
+        let output_tape = run_program(noun, verb, memory_tape.clone());
+        if output_tape[0] == desired_output {
+            return Some((noun, verb));
+        }
+    }
+    None
+}
+
 fn main() -> Result<(), anyhow::Error> {
     let memory_tape = read_input("input.txt")?;
 
     reproduce_1202_program_alarm(memory_tape.clone());
+
+    if let Some((noun, verb)) = find_input_pair(19690720, memory_tape.clone()) {
+        println!("{:?}", 100 * noun + verb);
+    }
 
     Ok(())
 }
