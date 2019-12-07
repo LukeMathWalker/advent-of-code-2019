@@ -112,14 +112,58 @@ impl TuringMachine {
                 self.instruction_pointer += 2;
                 println!("Operation output value: {:?}", input);
                 Outcome::Success
-            }
+            },
             4 => {
                 let output_index = self.get_parameter(1, parameter_modes[0], true);
                 let output = self.memory_tape[output_index as usize];
                 self.instruction_pointer += 2;
                 println!("Operation output value: {:?}", output);
                 Outcome::Output(output)
-            }
+            },
+            5 => {
+                let first_parameter = self.get_parameter(1, parameter_modes[0], false);
+                let second_parameter = self.get_parameter(2, parameter_modes[1], false);
+                if first_parameter != 0 {
+                    self.instruction_pointer = second_parameter as usize;
+                } else {
+                    self.instruction_pointer += 3;
+                }
+                Outcome::Success
+            },
+            6 => {
+                let first_parameter = self.get_parameter(1, parameter_modes[0], false);
+                let second_parameter = self.get_parameter(2, parameter_modes[1], false);
+                if first_parameter == 0 {
+                    self.instruction_pointer = second_parameter as usize;
+                } else {
+                    self.instruction_pointer += 3;
+                }
+                Outcome::Success
+            },
+            7 => {
+                let first_parameter = self.get_parameter(1, parameter_modes[0], false);
+                let second_parameter = self.get_parameter(2, parameter_modes[1], false);
+                let third_parameter = self.get_parameter(3, parameter_modes[2], true);
+                if first_parameter < second_parameter {
+                    self.memory_tape[third_parameter as usize] = 1;
+                } else {
+                    self.memory_tape[third_parameter as usize] = 0;
+                }
+                self.instruction_pointer += 4;
+                Outcome::Success
+            },
+            8 => {
+                let first_parameter = self.get_parameter(1, parameter_modes[0], false);
+                let second_parameter = self.get_parameter(2, parameter_modes[1], false);
+                let third_parameter = self.get_parameter(3, parameter_modes[2], true);
+                if first_parameter == second_parameter {
+                    self.memory_tape[third_parameter as usize] = 1;
+                } else {
+                    self.memory_tape[third_parameter as usize] = 0;
+                }
+                self.instruction_pointer += 4;
+                Outcome::Success
+            },
             99 => Outcome::Halt,
             _ => panic!("Unknown opcode!"),
         }
@@ -149,7 +193,14 @@ impl TuringMachine {
 
 fn main() {
     let memory_tape = read_input("input.txt");
-    let program = TuringMachine::new(memory_tape);
-    let (memory_tape, output_tape) = program.execute(1);
+
+    // First part
+    let program = TuringMachine::new(memory_tape.clone());
+    let (_, output_tape) = program.execute(1);
+    println!("Output tape: {:?}", output_tape);
+
+    // Second part
+    let program = TuringMachine::new(memory_tape.clone());
+    let (_, output_tape) = program.execute(5);
     println!("Output tape: {:?}", output_tape);
 }
