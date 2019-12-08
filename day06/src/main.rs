@@ -27,15 +27,15 @@ fn count_orbits(graph: &DiGraphMap<&str, ()>) -> usize {
 fn count_indirect_orbits<'a>(graph: &DiGraphMap<&'a str, ()>, root_node: &'a str) -> usize {
     let mut acc = 0;
     for neighbour in graph.neighbors_directed(root_node, Direction::Outgoing) {
-        acc += _count_indirect_orbits(&graph, &neighbour, 0, acc);
+        acc += _count_indirect_orbits(&graph, &neighbour, 0);
     }
     acc
 }
 
-fn _count_indirect_orbits<'a>(graph: &DiGraphMap<&'a str, ()>, node: &'a str, depth: usize, mut acc: usize) -> usize {
-    acc += depth;
+fn _count_indirect_orbits<'a>(graph: &DiGraphMap<&'a str, ()>, node: &'a str, depth: usize) -> usize {
+    let mut acc = depth;
     for neighbour in graph.neighbors_directed(node, Direction::Outgoing) {
-        acc = _count_indirect_orbits(&graph, &neighbour, depth + 1, acc);
+        acc += _count_indirect_orbits(&graph, &neighbour, depth + 1);
     }
     acc
 }
@@ -75,4 +75,3 @@ mod tests {
         assert_eq!(n_orbits, 42);
     }
 }
-
