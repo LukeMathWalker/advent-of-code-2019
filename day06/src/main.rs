@@ -1,7 +1,7 @@
-use petgraph::graphmap::DiGraphMap;
-use petgraph::Direction;
+use petgraph::algo::{astar, is_cyclic_directed};
+use petgraph::graphmap::{DiGraphMap, GraphMap};
+use petgraph::{Direction, Undirected};
 use std::io::BufRead;
-use petgraph::algo::is_cyclic_directed;
 
 fn read_input(path: &str) -> Vec<(String, String)> {
     fn parse(l: &str) -> (String, String) {
@@ -24,7 +24,7 @@ fn read_input(path: &str) -> Vec<(String, String)> {
 fn count_orbits<'a>(graph: &DiGraphMap<&'a str, ()>, root_node: &'a str) -> usize {
     let mut acc = 0;
     for neighbour in graph.neighbors_directed(root_node, Direction::Outgoing) {
-        acc += _count_indirect_orbits(&graph, &neighbour, 1);
+        acc += _count_orbits(&graph, &neighbour, 1);
     }
     acc
 }
@@ -40,17 +40,22 @@ fn _count_orbits<'a>(graph: &DiGraphMap<&'a str, ()>, node: &'a str, depth: usiz
 fn main() {
     let orbits = read_input("input.txt");
     let edges = orbits.iter().map(|(x, y)| (x.as_str(), y.as_str()));
-    let graph: DiGraphMap<_, ()> = DiGraphMap::from_edges(edges);
+    let graph: DiGraphMap<_, ()> = DiGraphMap::from_edges(edges.clone());
 
     assert!(!is_cyclic_directed(&graph));
     let n_orbits = count_orbits(&graph, "COM");
     println!("Total number of orbits: {:?}.", n_orbits);
+
+    let graph: GraphMap<_, (), Undirected> = GraphMap::from_edges(edges);
+    let (distance, _) =
+        astar(&graph, "YOU", |f| f == "SAN", |_| 1, |_| 0).expect("Failed to find a path.");
+    println!("Distance between YOU and SAN: {:?}", distance - 2);
 }
 
 #[cfg(test)]
 mod tests {
-    use petgraph::graphmap::DiGraphMap;
     use crate::{count_orbits, parse};
+    use petgraph::graphmap::DiGraphMap;
 
     #[test]
     fn part_1_example() {
