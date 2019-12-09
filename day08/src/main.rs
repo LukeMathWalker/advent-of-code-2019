@@ -35,11 +35,23 @@ fn count_digit(l: &ArrayView2<u8>, digit: u8) -> u32 {
     }).sum()
 }
 
+fn get_image(layers: Array3<u8>) -> Array2<u8> {
+    layers.map_axis(Axis(0), |pixels| {
+        for &pixel in pixels.iter() {
+            if pixel != 2 {
+                return pixel;
+            }
+        }
+        2
+    })
+}
+
 fn main() {
     let digits = read_input("input.txt");
-    let width = 25;
-    let height = 6;
+    let width = 6;
+    let height = 25;
 
     let layers = get_layers(width, height, digits);
-    println!("Checksum: {:?}", checksum(&layers))
+    println!("Checksum: {:?}", checksum(&layers));
+    println!("Image:\n{:?}", get_image(layers));
 }
